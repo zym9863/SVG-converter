@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultImage = document.getElementById('result-image');
     const copyBtn = document.getElementById('copy-btn');
     const downloadBtn = document.getElementById('download-btn');
+    
+    // 创建全屏模态框元素（初始不添加到DOM）
+    let fullscreenModal = null;
 
     // 示例SVG代码
     const exampleSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
@@ -40,6 +43,124 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初始预览
     previewSvg();
+    
+    // 添加点击预览区域事件，实现SVG全屏显示
+    previewContainer.addEventListener('click', function() {
+        showFullscreenSvg();
+    });
+    
+    // 显示SVG全屏函数
+    function showFullscreenSvg() {
+        const svgElement = previewContainer.querySelector('svg');
+        if (!svgElement) return;
+        
+        // 创建模态框
+        fullscreenModal = document.createElement('div');
+        fullscreenModal.className = 'fullscreen-modal';
+        
+        // 创建SVG容器，用于滚动和缩放
+        const svgContainer = document.createElement('div');
+        svgContainer.className = 'svg-container';
+        
+        // 创建关闭按钮
+        const closeButton = document.createElement('div');
+        closeButton.className = 'close-modal';
+        closeButton.innerHTML = '×';
+        closeButton.addEventListener('click', function(e) {
+            e.stopPropagation(); // 阻止事件冒泡
+            document.body.removeChild(fullscreenModal);
+            fullscreenModal = null;
+        });
+        
+        // 创建缩放控制按钮
+        const zoomControls = document.createElement('div');
+        zoomControls.className = 'zoom-controls';
+        
+        const zoomInBtn = document.createElement('div');
+        zoomInBtn.className = 'zoom-btn zoom-in';
+        zoomInBtn.innerHTML = '+';
+        
+        const zoomOutBtn = document.createElement('div');
+        zoomOutBtn.className = 'zoom-btn zoom-out';
+        zoomOutBtn.innerHTML = '-';
+        
+        const zoomResetBtn = document.createElement('div');
+        zoomResetBtn.className = 'zoom-btn zoom-reset';
+        zoomResetBtn.innerHTML = '↺';
+        
+        zoomControls.appendChild(zoomInBtn);
+        zoomControls.appendChild(zoomOutBtn);
+        zoomControls.appendChild(zoomResetBtn);
+        
+        // 复制SVG到容器
+        const svgClone = svgElement.cloneNode(true);
+        svgContainer.appendChild(svgClone);
+        
+        // 添加到模态框
+        fullscreenModal.appendChild(svgContainer);
+        fullscreenModal.appendChild(closeButton);
+        fullscreenModal.appendChild(zoomControls);
+        
+        // 当前缩放级别
+        let currentScale = 1;
+        const scaleStep = 0.2;
+        
+        // 缩放函数
+        function updateScale() {
+            svgClone.style.transform = `scale(${currentScale})`;
+            svgClone.style.transformOrigin = 'center center';
+        }
+        
+        // 缩放按钮事件
+        zoomInBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            currentScale += scaleStep;
+            updateScale();
+        });
+        
+        zoomOutBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (currentScale > scaleStep) {
+                currentScale -= scaleStep;
+                updateScale();
+            }
+        });
+        
+        zoomResetBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            currentScale = 1;
+            updateScale();
+        });
+        
+        // 鼠标滚轮缩放
+        svgContainer.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                // 向上滚动，放大
+                currentScale += scaleStep;
+            } else {
+                // 向下滚动，缩小
+                if (currentScale > scaleStep) {
+                    currentScale -= scaleStep;
+                }
+            }
+            updateScale();
+        });
+        
+        // 点击模态框背景也可以关闭
+        fullscreenModal.addEventListener('click', function() {
+            document.body.removeChild(fullscreenModal);
+            fullscreenModal = null;
+        });
+        
+        // 阻止SVG容器点击事件冒泡到模态框
+        svgContainer.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // 添加到body
+        document.body.appendChild(fullscreenModal);
+    }
 
     // 预览SVG函数
     function previewSvg() {
