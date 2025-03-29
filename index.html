@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG转换工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>SVG转换工具</h1>
+        <div class="main-content">
+            <div class="input-section">
+                <h2>SVG代码</h2>
+                <textarea id="svg-input" placeholder="在此粘贴您的SVG代码..."></textarea>
+                <div class="buttons">
+                    <button id="preview-btn">预览</button>
+                    <button id="convert-btn">转换为PNG</button>
+                </div>
+            </div>
+            <div class="output-section">
+                <div id="preview-container"></div>
+                <div id="result-container" class="hidden">
+                    <div class="result-image-container">
+                        <img id="result-image" alt="转换结果">
+                    </div>
+                    <div class="result-buttons">
+                        <button id="copy-btn">复制图像</button>
+                        <button id="download-btn">下载图像</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
