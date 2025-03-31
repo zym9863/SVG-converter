@@ -1,6 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 初始化CodeMirror编辑器
+    const editor = CodeMirror.fromTextArea(document.getElementById('svg-input'), {
+        mode: 'xml',
+        theme: 'monokai',
+        lineNumbers: true,
+        lineWrapping: true,
+        autoCloseTags: true,
+        matchTags: {bothTags: true},
+        indentUnit: 4,
+        viewportMargin: Infinity
+    });
+
     // 获取DOM元素
-    const svgInput = document.getElementById('svg-input');
     const previewBtn = document.getElementById('preview-btn');
     const convertBtn = document.getElementById('convert-btn');
     const previewContainer = document.getElementById('preview-container');
@@ -19,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </svg>`;
 
     // 设置示例SVG代码
-    svgInput.value = exampleSvg;
+    editor.setValue(exampleSvg);
 
     // 预览SVG
     previewBtn.addEventListener('click', function() {
@@ -164,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 预览SVG函数
     function previewSvg() {
-        const svgCode = svgInput.value.trim();
+        const svgCode = editor.getValue().trim();
         if (!svgCode) {
             previewContainer.innerHTML = '<p>请输入有效的SVG代码</p>';
             return;
@@ -184,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 转换为PNG函数
     function convertToPng() {
-        const svgCode = svgInput.value.trim();
+        const svgCode = editor.getValue().trim();
         if (!svgCode) {
             alert('请输入有效的SVG代码');
             return;

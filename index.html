@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVG转换工具</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -12,7 +16,9 @@
         <div class="main-content">
             <div class="input-section">
                 <h2>SVG代码</h2>
-                <textarea id="svg-input" placeholder="在此粘贴您的SVG代码..."></textarea>
+                <div id="editor-container">
+                    <textarea id="svg-input" placeholder="在此粘贴您的SVG代码..."></textarea>
+                </div>
                 <div class="buttons">
                     <button id="preview-btn">预览</button>
                     <button id="convert-btn">转换为PNG</button>
