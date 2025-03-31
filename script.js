@@ -173,11 +173,116 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(fullscreenModal);
     }
 
+    // 验证SVG代码函数
+    function validateSvgCode(svgCode) {
+        // 创建一个新的DOMParser
+        const parser = new DOMParser();
+        
+        // 解析SVG代码
+        const doc = parser.parseFromString(svgCode, 'image/svg+xml');
+        
+        // 检查是否有解析错误
+        const parserError = doc.querySelector('parsererror');
+        if (parserError) {
+            // 提取错误信息
+            let errorMsg = parserError.textContent;
+            
+            // 尝试提取更具体的错误位置和原因
+            const errorDetails = [];
+            
+            // 常见SVG错误检查
+            if (svgCode.indexOf('<svg') === -1) {
+                errorDetails.push('缺少<svg>根元素');
+            } else if (!svgCode.includes('xmlns="http://www.w3.org/2000/svg"')) {
+                errorDetails.push('缺少必要的xmlns属性');
+            }
+            
+            // 检查标签是否闭合
+            const openTags = svgCode.match(/<[a-zA-Z][^>]*[^/]>/g) || [];
+            const closeTags = svgCode.match(/<\/[a-zA-Z][^>]*>/g) || [];
+            const selfClosingTags = svgCode.match(/<[a-zA-Z][^>]*\/>/g) || [];
+            
+            if (openTags.length > (closeTags.length + selfClosingTags.length)) {
+                errorDetails.push('存在未闭合的标签');
+            }
+            
+            // 检查属性格式
+            const attrWithoutQuotes = svgCode.match(/\s[a-zA-Z-]+=\s*[^"'][^\s>]*/g);
+            if (attrWithoutQuotes) {
+                errorDetails.push('属性值应使用引号包裹');
+            }
+            
+            // 返回错误信息和修复建议
+            return {
+                valid: false,
+                error: errorMsg,
+                details: errorDetails,
+                suggestions: [
+                    '确保SVG代码以svg标签开始并以/svg结束',
+                    '添加必要的xmlns属性: xmlns="http://www.w3.org/2000/svg"',
+                    '检查所有标签是否正确闭合',
+                    '确保所有属性值都使用引号包裹',
+                    '检查元素名称和属性名称的拼写是否正确'
+                ]
+            };
+        }
+        
+        // 检查SVG根元素
+        const svgRoot = doc.documentElement;
+        if (svgRoot.nodeName.toLowerCase() !== 'svg') {
+            return {
+                valid: false,
+                error: '文档根元素不是SVG',
+                details: ['文档的根元素必须是<svg>'],
+                suggestions: ['确保SVG代码以<svg>标签开始并以</svg>结束']
+            };
+        }
+        
+        // SVG代码有效
+        return { valid: true };
+    }
+    
     // 预览SVG函数
     function previewSvg() {
         const svgCode = editor.getValue().trim();
         if (!svgCode) {
             previewContainer.innerHTML = '<p>请输入有效的SVG代码</p>';
+            return;
+        }
+
+        // 验证SVG代码
+        const validation = validateSvgCode(svgCode);
+        
+        if (!validation.valid) {
+            // 创建错误提示容器
+            let errorHtml = `<div class="svg-error">
+                <h3>SVG语法错误</h3>
+                <p>${validation.error}</p>`;
+            
+            // 添加详细错误信息
+            if (validation.details && validation.details.length > 0) {
+                errorHtml += '<ul class="error-details">';
+                validation.details.forEach(detail => {
+                    errorHtml += `<li>${detail}</li>`;
+                });
+                errorHtml += '</ul>';
+            }
+            
+            // 添加修复建议
+            if (validation.suggestions && validation.suggestions.length > 0) {
+                errorHtml += '<h4>修复建议:</h4><ul class="error-suggestions">';
+                validation.suggestions.forEach(suggestion => {
+                    errorHtml += `<li>${suggestion}</li>`;
+                });
+                errorHtml += '</ul>';
+            }
+            
+            errorHtml += '</div>';
+            
+            // 显示错误信息
+            previewContainer.innerHTML = errorHtml;
+            // 隐藏结果容器
+            resultContainer.classList.add('hidden');
             return;
         }
 
