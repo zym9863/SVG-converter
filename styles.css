@@ -327,12 +327,12 @@ button:active {
     .main-content {
         flex-direction: column;
     }
-    
+
     .input-section, .output-section {
         width: 100%;
         margin-bottom: 20px;
     }
-    
+
     .container {
         padding: 20px;
     }
@@ -346,4 +346,54 @@ button:active {
 @keyframes fadeIn {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
+}
+
+/* PWA安装按钮样式 */
+.install-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--glass-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    font-weight: bold;
+    display: none; /* 默认隐藏，通过JS控制显示 */
+}
+
+.install-button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+/* 针对PWA的离线状态提示 */
+.offline-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 152, 0, 0.9);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.offline-indicator::before {
+    content: "●";
+    margin-right: 8px;
+    color: #fff;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
