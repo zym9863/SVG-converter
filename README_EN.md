@@ -6,8 +6,8 @@ A simple and easy-to-use web application for converting SVG code to PNG image fo
 
 ## Features
 
-- **SVG Preview**: Real-time preview of SVG code effects
-- **PNG Conversion**: Convert SVG code to PNG image
+- **SVG Real-time Preview**: Automatically preview SVG code effects as you type
+- **Automatic PNG Conversion**: Automatically convert SVG code to PNG image without manual operation
 - **One-Click Copy**: Directly copy the converted PNG image to clipboard
 - **Image Download**: Download the converted PNG image to local storage
 - **Beautiful Interface**: Adopts glass-morphism design, modern and clean visual effect
@@ -17,11 +17,12 @@ A simple and easy-to-use web application for converting SVG code to PNG image fo
 ## How to Use
 
 1. Enter or paste SVG code in the left text box
-2. Click the "Preview" button to view the SVG effect
-3. Click the "Convert to PNG" button to convert SVG to PNG format
-4. After conversion, you can choose to:
+2. The SVG effect will automatically display in the preview area on the right
+3. PNG conversion happens automatically, no manual operation needed
+4. You can choose to:
    - Click "Copy Image" to copy the PNG to clipboard
    - Click "Download Image" to save the PNG to local storage
+5. Click on the preview area to view SVG in fullscreen mode
 
 ## Technical Implementation
 
@@ -43,7 +44,7 @@ A simple and easy-to-use web application for converting SVG code to PNG image fo
 
 ## Example
 
-The tool provides a simple SVG example code by default. You can directly click the preview and conversion buttons to experience the functionality. You can also replace it with your own SVG code for conversion.
+The tool provides a simple SVG example code by default. The preview and conversion will happen automatically as soon as you load the page. You can replace the example with your own SVG code for conversion.
 
 ## PWA Installation and Usage
 

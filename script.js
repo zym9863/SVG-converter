@@ -33,8 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 获取DOM元素
-    const previewBtn = document.getElementById('preview-btn');
-    const convertBtn = document.getElementById('convert-btn');
     const previewContainer = document.getElementById('preview-container');
     const resultContainer = document.getElementById('result-container');
     const resultImage = document.getElementById('result-image');
@@ -53,16 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 设置示例SVG代码
     editor.setValue(exampleSvg);
 
-    // 预览SVG
-    previewBtn.addEventListener('click', function() {
-        previewSvg();
-    });
-
-    // 转换为PNG
-    convertBtn.addEventListener('click', function() {
-        convertToPng();
-    });
-
     // 复制图像
     copyBtn.addEventListener('click', function() {
         copyImage();
@@ -73,8 +61,19 @@ document.addEventListener('DOMContentLoaded', function() {
         downloadImage();
     });
 
-    // 初始预览
+    // 初始预览和转换
     previewSvg();
+    convertToPng();
+
+    // 监听编辑器内容变化，自动预览和转换
+    editor.on('change', function() {
+        previewSvg();
+        // 添加延迟以避免频繁转换
+        clearTimeout(editor.conversionTimeout);
+        editor.conversionTimeout = setTimeout(function() {
+            convertToPng();
+        }, 1000); // 1秒延迟
+    });
 
     // 添加点击预览区域事件，实现SVG全屏显示
     previewContainer.addEventListener('click', function() {
@@ -355,26 +354,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // 显示结果容器中的按钮，但隐藏图像
                     resultContainer.classList.remove('hidden');
-                    document.querySelector('.result-image-container').style.display = 'none';
-
-                    // 提示用户转换已完成，可以进行复制或下载操作
-                    alert('SVG已成功转换为PNG，现在您可以使用"复制图像"或"下载图像"按钮');
 
                     // 释放SVG URL
                     URL.revokeObjectURL(svgUrl);
                 } catch (error) {
-                    alert(`转换错误: ${error.message}`);
+                    console.error(`转换错误: ${error.message}`);
+                    resultContainer.classList.add('hidden');
                 }
             };
 
             img.onerror = function() {
-                alert('无法加载SVG图像');
+                console.error('无法加载SVG图像');
+                resultContainer.classList.add('hidden');
                 URL.revokeObjectURL(svgUrl);
             };
 
             img.src = svgUrl;
         } catch (error) {
-            alert(`转换错误: ${error.message}`);
+            console.error(`转换错误: ${error.message}`);
+            resultContainer.classList.add('hidden');
         }
     }
 
