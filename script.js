@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 添加网络状态变化事件监听器
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
+    
     // 初始化CodeMirror编辑器
     const editor = CodeMirror.fromTextArea(document.getElementById('svg-input'), {
         mode: 'xml',
@@ -318,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 转换为PNG函数
+    // 转换为PNG函数（彻底修复模糊问题）
     function convertToPng() {
         const svgCode = editor.getValue().trim();
         if (!svgCode) {
@@ -327,63 +328,126 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            // 创建SVG Blob
-            const svgBlob = new Blob([svgCode], {type: 'image/svg+xml;charset=utf-8'});
+            // 解析SVG以获取尺寸信息
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgCode, 'image/svg+xml');
+            const svgElement = svgDoc.documentElement;
+            
+            // 获取SVG的viewBox或width/height属性
+            let svgWidth = 400; // 默认宽度
+            let svgHeight = 400; // 默认高度
+            
+            if (svgElement.hasAttribute('viewBox')) {
+                const viewBox = svgElement.getAttribute('viewBox').split(' ');
+                svgWidth = parseFloat(viewBox[2]) || 400;
+                svgHeight = parseFloat(viewBox[3]) || 400;
+            } else {
+                if (svgElement.hasAttribute('width')) {
+                    const widthAttr = svgElement.getAttribute('width');
+                    svgWidth = parseFloat(widthAttr.replace(/px|pt|em|rem|%|mm|cm|in/g, '')) || 400;
+                }
+                if (svgElement.hasAttribute('height')) {
+                    const heightAttr = svgElement.getAttribute('height');
+                    svgHeight = parseFloat(heightAttr.replace(/px|pt|em|rem|%|mm|cm|in/g, '')) || 400;
+                }
+            }
+            
+            // 确保SVG有正确的命名空间和viewBox
+            let optimizedSvgCode = svgCode;
+            if (!svgElement.hasAttribute('xmlns')) {
+                optimizedSvgCode = svgCode.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            if (!svgElement.hasAttribute('viewBox')) {
+                optimizedSvgCode = optimizedSvgCode.replace('<svg', `<svg viewBox="0 0 ${svgWidth} ${svgHeight}"`);
+            }
+            
+            // 使用更高的缩放倍数确保清晰度
+            const scaleFactor = 4; // 固定4倍缩放
+            
+            // 创建一个隐藏的SVG元素用于渲染
+            const tempSvg = document.createElement('div');
+            tempSvg.innerHTML = optimizedSvgCode;
+            tempSvg.style.position = 'absolute';
+            tempSvg.style.left = '-9999px';
+            tempSvg.style.top = '-9999px';
+            document.body.appendChild(tempSvg);
+            
+            const svgEl = tempSvg.querySelector('svg');
+            svgEl.setAttribute('width', svgWidth * scaleFactor);
+            svgEl.setAttribute('height', svgHeight * scaleFactor);
+            
+            // 创建Canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置Canvas尺寸
+            canvas.width = svgWidth * scaleFactor;
+            canvas.height = svgHeight * scaleFactor;
+            
+            // 设置高质量渲染选项
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            // 将SVG转换为Data URL
+            const svgData = new XMLSerializer().serializeToString(svgEl);
+            const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
             const svgUrl = URL.createObjectURL(svgBlob);
-
+            
             // 创建图像对象
             const img = new Image();
             img.onload = function() {
-                // 创建Canvas
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-
-                // 设置Canvas尺寸
-                canvas.width = img.width;
-                canvas.height = img.height;
-
-                // 绘制图像到Canvas
-                ctx.drawImage(img, 0, 0);
-
-                // 转换为PNG
+                // 清除画布并设置白色背景
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制图像
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // 转换为PNG（最高质量）
                 try {
-                    const pngUrl = canvas.toDataURL('image/png');
-
-                    // 设置图像源但不显示图像本身
+                    const pngUrl = canvas.toDataURL('image/png', 1.0);
+                    
+                    // 设置图像源
                     resultImage.src = pngUrl;
-
-                    // 显示结果容器中的按钮，但隐藏图像
+                    
+                    // 显示结果容器
                     resultContainer.classList.remove('hidden');
-
-                    // 释放SVG URL
+                    
+                    // 清理资源
                     URL.revokeObjectURL(svgUrl);
+                    document.body.removeChild(tempSvg);
+                    
+                    console.log(`转换完成: ${svgWidth}x${svgHeight} -> ${canvas.width}x${canvas.height}`);
                 } catch (error) {
                     console.error(`转换错误: ${error.message}`);
                     resultContainer.classList.add('hidden');
+                    document.body.removeChild(tempSvg);
                 }
             };
-
+            
             img.onerror = function() {
                 console.error('无法加载SVG图像');
                 resultContainer.classList.add('hidden');
                 URL.revokeObjectURL(svgUrl);
+                document.body.removeChild(tempSvg);
             };
-
+            
             img.src = svgUrl;
+            
         } catch (error) {
             console.error(`转换错误: ${error.message}`);
             resultContainer.classList.add('hidden');
         }
     }
 
-    // 复制图像函数
+    // 复制图像函数（保持高分辨率）
     function copyImage() {
         if (resultImage.src) {
             // 创建Canvas
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // 设置Canvas尺寸
+            // 设置Canvas尺寸为结果图像的自然尺寸（保持高分辨率）
             canvas.width = resultImage.naturalWidth;
             canvas.height = resultImage.naturalHeight;
 
@@ -403,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } catch (error) {
                     alert('您的浏览器不支持图像复制功能');
                 }
-            });
+            }, 'image/png', 1.0);
         } else {
             alert('请先转换图像');
         }
