@@ -43,10 +43,101 @@ document.addEventListener('DOMContentLoaded', function() {
     // 创建全屏模态框元素（初始不添加到DOM）
     let fullscreenModal = null;
 
-    // 示例SVG代码
-    const exampleSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
-        <circle cx="100" cy="100" r="80" fill="#3498db" />
-        <text x="100" y="115" font-family="Arial" font-size="24" text-anchor="middle" fill="white">SVG示例</text>
+    // Bento Grid风格示例SVG代码
+    const exampleSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+        <!-- 背景渐变和阴影定义 -->
+        <defs>
+            <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="cardGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="cardGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="cardGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="cardGradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="cardGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+            </linearGradient>
+            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.1"/>
+            </filter>
+        </defs>
+        
+        <!-- 背景 -->
+        <rect width="400" height="400" fill="url(#bgGradient)" />
+        
+        <!-- 大卡片 (左上) Analytics -->
+        <rect x="20" y="20" width="180" height="120" rx="16" fill="url(#cardGradient1)" filter="url(#shadow)" />
+        <circle cx="80" cy="60" r="20" fill="rgba(255,255,255,0.3)" />
+        <text x="120" y="70" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="600" fill="white">Analytics</text>
+        <text x="120" y="90" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700" fill="white">2.4K</text>
+        <text x="120" y="110" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" fill="rgba(255,255,255,0.8)">+12% this week</text>
+        
+        <!-- 中等卡片 (右上) Revenue -->
+        <rect x="220" y="20" width="160" height="80" rx="16" fill="url(#cardGradient2)" filter="url(#shadow)" />
+        <rect x="240" y="40" width="24" height="24" rx="4" fill="rgba(255,255,255,0.3)" />
+        <text x="275" y="52" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="600" fill="white">Revenue</text>
+        <text x="275" y="72" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="700" fill="white">$12,450</text>
+        
+        <!-- 小卡片 (右中) Tasks -->
+        <rect x="220" y="120" width="160" height="60" rx="16" fill="url(#cardGradient3)" filter="url(#shadow)" />
+        <circle cx="250" cy="150" r="12" fill="rgba(255,255,255,0.3)" />
+        <text x="275" y="150" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="white">Tasks</text>
+        <text x="275" y="165" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" fill="white">24/30</text>
+        
+        <!-- 中等卡片 (左下) Messages -->
+        <rect x="20" y="160" width="120" height="100" rx="16" fill="url(#cardGradient4)" filter="url(#shadow)" />
+        <rect x="35" y="180" width="16" height="16" rx="3" fill="rgba(255,255,255,0.3)" />
+        <text x="35" y="210" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="white">Messages</text>
+        <text x="35" y="230" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="700" fill="white">127</text>
+        <text x="35" y="245" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)">5 unread</text>
+        
+        <!-- 小卡片 (中下) Profile -->
+        <rect x="160" y="160" width="80" height="60" rx="16" fill="url(#cardGradient5)" filter="url(#shadow)" />
+        <circle cx="185" cy="185" r="8" fill="rgba(255,255,255,0.3)" />
+        <text x="200" y="205" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="600" fill="white" text-anchor="middle">Profile</text>
+        <text x="200" y="215" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="700" fill="white" text-anchor="middle">95%</text>
+        
+        <!-- 小卡片 (右下左) Status -->
+        <rect x="160" y="240" width="80" height="60" rx="16" fill="rgba(15, 23, 42, 0.8)" filter="url(#shadow)" />
+        <rect x="175" y="255" width="12" height="12" rx="2" fill="#10b981" />
+        <text x="200" y="275" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="600" fill="white" text-anchor="middle">Status</text>
+        <text x="200" y="285" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="#10b981" text-anchor="middle">Online</text>
+        
+        <!-- 中等卡片 (右下) Storage -->
+        <rect x="260" y="200" width="120" height="100" rx="16" fill="rgba(15, 23, 42, 0.9)" filter="url(#shadow)" />
+        <rect x="275" y="220" width="20" height="20" rx="4" fill="#3b82f6" />
+        <text x="305" y="228" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="white">Storage</text>
+        <text x="305" y="245" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="700" fill="white">2.1 GB</text>
+        <text x="305" y="260" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="rgba(255,255,255,0.6)">of 5 GB used</text>
+        <!-- 进度条 -->
+        <rect x="275" y="270" width="90" height="4" rx="2" fill="rgba(255,255,255,0.1)" />
+        <rect x="275" y="270" width="37" height="4" rx="2" fill="#3b82f6" />
+        
+        <!-- 小卡片 (左最下) Notifications -->
+        <rect x="20" y="280" width="120" height="60" rx="16" fill="rgba(15, 23, 42, 0.7)" filter="url(#shadow)" />
+        <circle cx="45" cy="305" r="10" fill="#f59e0b" />
+        <text x="65" y="305" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="white">Notifications</text>
+        <text x="65" y="320" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700" fill="white">3 new</text>
+        
+        <!-- 装饰性元素 -->
+        <circle cx="350" cy="50" r="3" fill="rgba(59, 130, 246, 0.3)" />
+        <circle cx="365" cy="35" r="2" fill="rgba(16, 185, 129, 0.4)" />
+        <circle cx="60" cy="350" r="2" fill="rgba(245, 158, 11, 0.4)" />
+        <circle cx="350" cy="380" r="2.5" fill="rgba(139, 92, 246, 0.3)" />
     </svg>`;
 
     // 设置示例SVG代码
